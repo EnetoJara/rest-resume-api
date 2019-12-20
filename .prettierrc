@@ -1,0 +1,9 @@
+{
+    "arrowParens": "always",
+    "cursorOffset": -1,
+    "endOfLine": "lf",
+    "parser":"typescript",
+    "printWidth": 120,
+    "quoteProps": "as-needed",
+    "semi": true
+}
