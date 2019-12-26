@@ -4,10 +4,6 @@ import { runQuery } from "../db/mysqls";
 import { UserModel } from "../models/user-model";
 import { logger } from "../utils/logger";
 
-
-
-
-
 /**
  * UserService class handles the logic needed to work with the users data.
  *

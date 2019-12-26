@@ -6,7 +6,7 @@ import { logger } from "./utils/logger";
 import { validateLogin, validateUserRegistration } from "./utils/validator";
 
 function log (req: Request, res: Response, next: NextFunction): void {
-  const {method} = req;
+    const { method } = req;
     logger.debug("-------------------------------------");
     logger.debug("-------------------------------------");
     logger.debug("-------------------------------------");
@@ -32,7 +32,7 @@ function log (req: Request, res: Response, next: NextFunction): void {
  * @returns login
  */
 function validLogin (req: Request, res: Response, next: NextFunction): void | Response {
-  logger.debug("-------------------------------------");
+    logger.debug("-------------------------------------");
     logger.debug("Loggin validator Middleware");
     const err = validateLogin(req.body as LoginCredentials);
 
@@ -54,8 +54,8 @@ function validLogin (req: Request, res: Response, next: NextFunction): void | Re
  * @returns login
  */
 function validRegister (req: Request, res: Response, next: NextFunction): void | Response {
-  logger.debug("-------------------------------------");
-  logger.debug("register validator Middleware");
+    logger.debug("-------------------------------------");
+    logger.debug("register validator Middleware");
 
     const errors = validateUserRegistration(req.body as RegisterCredentials);
 
@@ -72,8 +72,8 @@ function validRegister (req: Request, res: Response, next: NextFunction): void |
  * @returns {Router} api - endpoints of the app.
  */
 export function routes (): Router {
-  logger.debug("-------------------------------------");
-  logger.debug("routes");
+    logger.debug("-------------------------------------");
+    logger.debug("routes");
 
     const api: Router = Router();
     const userController = new UserController();

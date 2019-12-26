@@ -49,7 +49,7 @@ export class UserController {
 
             connection = await beginTransaction(connection);
             const credentials = req.body as LoginCredentials;
-            const auxUser = await this.userService.getUserByEmail(connection, credentials.email) as UserExists;
+            const auxUser = (await this.userService.getUserByEmail(connection, credentials.email)) as UserExists;
             if (typeof auxUser === "undefined") {
                 await commitTransaction(connection);
                 return res
@@ -58,7 +58,7 @@ export class UserController {
             }
 
             const user = new UserModel(auxUser);
-            console.log('user: ', user);
+            console.log("user: ", user);
             const validPassword = await isEqualsPassword(user.password, credentials.password);
 
             if (!validPassword) {
@@ -77,10 +77,9 @@ export class UserController {
                 secondLastName: user.secondLastName
             };
 
-            const token = createToken({...toSend});
+            const token = createToken({ ...toSend });
 
-
-            return res.status(OK).send({ success: true, message: getStatusText(OK), user: {...toSend, token} });
+            return res.status(OK).send({ success: true, message: getStatusText(OK), user: { ...toSend, token } });
         } catch (error) {
             return res.status(GONE).send({ success: true, message: getStatusText(GONE) });
         }
@@ -103,7 +102,7 @@ export class UserController {
 
             connection = await beginTransaction(connection);
             const user = new UserModel(req.body);
-            const stored = await this.userService.getUserByEmail(connection, user.email) as UserExists;
+            const stored = (await this.userService.getUserByEmail(connection, user.email)) as UserExists;
 
             logger.debug(`stored: ${typeof stored}`);
             if (typeof stored !== "undefined") {
@@ -122,7 +121,6 @@ export class UserController {
 
             return res.status(CREATED).send({ success: true, message: getStatusText(CREATED) });
         } catch (error) {
-
             return res.status(500).send({ success: false, message: "Internal Server Error" });
         }
     }

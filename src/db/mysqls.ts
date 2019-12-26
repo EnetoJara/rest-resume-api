@@ -2,7 +2,6 @@ import * as mysql from "mysql";
 import { Rows } from "resume-app";
 import { logger } from "../utils/logger";
 
-
 let pool: mysql.Pool;
 
 function getPool (): mysql.Pool {

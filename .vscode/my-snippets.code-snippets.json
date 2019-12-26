@@ -1,0 +1,200 @@
+{
+	"adds console log": {
+		"description": "user snippet console log",
+		"scope": "javascript, typescript, javascriptreact, typescriptreact",
+		"prefix": "clg",
+		"body": "console.log('${1:obj}: ', ${1:obj});"
+	},
+	"Print to console": {
+		"description": "user snippet console log",
+		"scope": "javascript, typescript, javascriptreact, typescriptreact",
+		"prefix": "log",
+		"body": [
+			"console.log('$1');",
+			"$2"
+		],
+		"description": "Log output to console"
+	},
+	"vsriables of the environment": {
+		"description": "user snippet",
+		"scope": "javascript, typescript, javascriptreact, typescriptreact",
+		"prefix": "envdeclare",
+		"body": "export const ${1:variableName} = process.env.${1:variableName};",
+	},
+	"if statement": {
+		"description": "user snippet",
+		"scope": "javascript, typescript, javascriptreact, typescriptreact",
+		"prefix": "ifelse",
+		"body": "if (${1:condition}) {\n\t${2:}\n} else {\n\t}",
+	},
+	"export function action creator": {
+		"description": "user snippet",
+		"scope": "javascript, typescript, javascriptreact, typescriptreact",
+		"prefix": "exportfunccreator",
+		"body": [
+			"/**",
+			"* Action creator to handle ${5:description}",
+			"* @param {${4:paramTYpe}} ${2:params} value to be dispatched",
+			"* @returns {AppAction<${3:type},${4:paramTYpe}>} action",
+			"*/",
+			"export function ${1:functionName} (${2:params}:${4:paramTYpe}): AppAction<${3:type},${4:paramTYpe}> {",
+			"\treturn {",
+			"\t\ttype: ${3:type},",
+			"\t\tpayload: ${2:params}",
+			"\t}",
+			"}"
+		]
+	},
+	"react class component": {
+		"description": "user snippet",
+		"scope": "javascript, typescript, javascriptreact, typescriptreact",
+		"prefix": "rcc",
+		"body": [
+			"import React, { Component, ReactElement } from 'react';\n",
+			"export interface ${1:ClassComponent}Props {};",
+			"export type ${1:ClassComponent}State = any;\n",
+			"export class ${1:ClassComponent} extends Component {\n",
+			"\tpublic state: ${1:ClassComponent}State;",
+			"\tpublic constructor (props: ${1:ClassComponent}Props) {",
+			"\t\tsuper(props);\n",
+			"\t\tthis.render = this.render.bind(this);",
+			"\t\tthis.componentDidMount = this.componentDidMount.bind(this);",
+			"\t}\n",
+			"\tpublic componentDidMount () {",
+			"\t\tconsole.log('${1:ClassComponent} mounted');",
+			"\t}\n",
+			"\tpublicrender (): ReactElement<${1:ClassComponent}Props> {",
+			"\t\treturn (<div> component </div>);",
+			"\t}",
+			"}"
+		]
+	},
+	"react fucntional component": {
+		"description": "user snippet",
+		"scope": "javascript, typescript, javascriptreact, typescriptreact",
+		"prefix": "rfc",
+		"body": [
+			"import React, {ReactElement} from 'react';\n",
+			"export interface ${1:ClassComponent}Props {};",
+			"export function ${1:ReactComponent} (props: ${1:ReactComponent}Props): ReactElement<${1:ReactComponent}Props> {",
+			"\tconst {  } = props;",
+			"\treturn (<div>function</div>);",
+			"}"
+		]
+	},
+	"bind this to a method": {
+		"description": "user snippet",
+		"scope": "javascript, typescript, javascriptreact, typescriptreact",
+		"prefix": "bind",
+		"body": "this.${1:methodName} = this.${1:methodName}.bind(this);"
+	},
+	"const require": {
+		"description": "user snippet",
+		"scope": "javascript, typescript, javascriptreact, typescriptreact",
+		"prefix": "constrequire",
+		"body": "const ${1:module} = require('${2:npm}');"
+	},
+	"public endPoint": {
+		"description": "user snippet",
+		"scope": "javascript, typescript, javascriptreact, typescriptreact",
+		"prefix": "publicendpoint",
+		"body": [
+			"\t/**",
+			"\t * `HTTP Request handler`. Handles or manages the ",
+			"\t *",
+			"\t * @param {import('express').Request} req - HTTP Request Object.",
+			"\t * @param {import('express').Response} res - HTTP Response Object.",
+			"\t * @returns {import('es6-promise').Promise<Response>} res - a promise.",
+			"\t */",
+			"\tpublic async method (req: Request, res: Response): Promise<Response> {",
+			"\t\ttry {",
+			"\t\t\treturn res.status(200).send({success: true, message: 'success'});",
+			"\t\t} catch (error) {",
+			"\t\t\treturn res.status(500).send({success: false, message: 'Internal Server Error'});",
+			"\t\t}",
+			"\t}"
+		]
+	},
+	"export function": {
+		"description": "user snippet",
+		"scope":"typescript, typescriptreact",
+		"prefix": "exportfunction",
+		"body": "export function ${1:functionName} (${2:params}): ${3:ReturnType} {}"
+	},
+
+	"import default": {
+		"description": "user snippet",
+		"scope":"javascript, typescript, javascriptreact, typescriptreact",
+		"prefix": "importdef",
+		"body": "import ${2:What} from '${1:from}'"
+	},
+	"import from": {
+		"description": "user snippet",
+		"scope":"javascript, typescript, javascriptreact, typescriptreact",
+		"prefix": "importfrom",
+		"body": "import { ${2:What} } from '${1:from}'"
+	},
+
+	"public constructor": {
+		"description": "user snippet",
+		"prefix": "publicconstructor",
+		"scope":"typescript, typescriptreact",
+		"body": "public constructor () { super(); }"
+	},
+
+	"module exports": {
+		"description": "user snippet",
+		"scope":"javascript, typescript, javascriptreact, typescriptreact",
+		"prefix": "moduleexports",
+		"body": "module.exports = ${1:whhat}"
+	},
+
+	"object class": {
+		"description": "user snippet",
+		"prefix": "class",
+		"scope":"javascript, typescript, javascriptreact, typescriptreact",
+		"body": [
+			"export class ${1:ClassName} {",
+			"constructor () {}",
+			"}"
+		]
+	},
+
+	"sub class": {
+		"description": "user snippet",
+		"scope":"javascript, typescript, javascriptreact, typescriptreact",
+		"prefix": "classextends",
+		"body": [
+			"export class ${1:ClasName} extends ${2:ParentClass} {",
+			"constructor (3{:params}) {",
+			"super (3{:params});",
+			"}",
+			"}"
+		]
+	},
+
+	"for loop": {
+		"scope":"javascript, typescript, javascriptreact, typescriptreact",
+		"description": "user snippet for loop",
+		"prefix": "for",
+		"body": [
+			"for (let ${1:i} = 0; ${1:i} < ${2:length}; ${3:++|--}${1:i}) {",
+			"${4:body}",
+			"}"
+		]
+	},
+
+	"const": {
+		"scope":"javascript, typescript, javascriptreact, typescriptreact",
+		"description": "user snippet",
+		"prefix": "cons",
+		"body": "const ${1:VarNAme} = ${2:value};"
+	},
+
+	"constant":{
+		"scope":"javascript, typescript, javascriptreact, typescriptreact",
+		"desciption": "user snippet",
+		"prefix": "constant",
+		"body":"export const ${1:CONTANT_NAME} = ${2:CONSTANT_VALUE};"
+	}
+}
