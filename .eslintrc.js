@@ -5,6 +5,8 @@ module.exports = {
   root: true,
   extends: [
     "eslint:recommended",
+    "plugin:node/recommended",
+    "plugin:promise/recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking"
@@ -55,6 +57,11 @@ module.exports = {
       }
     ],
     "arrow-body-style": ["error", "as-needed"],
-    "arrow-parens": ["error", "always"]
-  }
+    "arrow-parens": ["error", "always"],
+  "node/exports-style": 0,
+  "node/file-extension-in-import": ["error", "never"],
+  "node/no-unsupported-features/es-syntax": 0,
+  "node/no-missing-import": 0,
+  "node/file-extension-in-import": 0
+  },
 };
