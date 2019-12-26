@@ -1,5 +1,7 @@
-require("../tools/env")();
+import * as dev from "../tools/env";
 import { start } from "./express";
+
+dev();
 
 const { NODE_ENV, ENETO_PORT = 5000 } = process.env;
 const app = start(NODE_ENV || "development");

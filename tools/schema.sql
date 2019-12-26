@@ -7,11 +7,11 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 -- -----------------------------------------------------
 -- Schema rest-resume-api
 -- -----------------------------------------------------
-
+DROP database `rest-resume-api`;
 -- -----------------------------------------------------
 -- Schema rest-resume-api
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `rest-resume-api` DEFAULT CHARACTER SET utf8 ;
+CREATE DATABASE IF NOT EXISTS `rest-resume-api` DEFAULT CHARACTER SET utf8 ;
 USE `rest-resume-api` ;
 
 -- -----------------------------------------------------
@@ -218,7 +218,7 @@ CREATE TABLE IF NOT EXISTS `rest-resume-api`.`v_getRoles` (`id` INT, `role` INT)
 -- -----------------------------------------------------
 -- Placeholder table for view `rest-resume-api`.`v_userByEmail`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `rest-resume-api`.`v_userByEmail` (`id` INT, `email` INT);
+CREATE TABLE IF NOT EXISTS `rest-resume-api`.`v_userByEmail` (`id` INT, `email` INT, `firstName` INT, `lastName` INT);
 
 -- -----------------------------------------------------
 -- Placeholder table for view `rest-resume-api`.`v_userLogin`
@@ -234,9 +234,9 @@ USE `rest-resume-api`$$
 CREATE PROCEDURE `sp_saveUser` (in _email varchar(50), in _password varchar(100), in _firstName varchar(50), in _secondName varchar(50), in _lastName varchar(50), in _secondLastName varchar(50), in _recluiter int)
 BEGIN
 
-	INSERT INTO users (email,   password,  firstName,  secondName,  lastName,  secondLastName, active,  idRole,    createdAt) 
+	INSERT INTO users (email,   password,  firstName,  secondName,  lastName,  secondLastName, active,  idRole,    createdAt)
     VALUES 			  (_email, _password, _firstName, _secondName, _lastName, _secondLastName,      0, _recluiter, now());
-    
+
     SELECT LAST_INSERT_ID();
 
 END$$
@@ -255,7 +255,7 @@ CREATE  OR REPLACE VIEW `v_getRoles` AS SELECT id, role FROM role;
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `rest-resume-api`.`v_userByEmail`;
 USE `rest-resume-api`;
-CREATE  OR REPLACE VIEW `v_userByEmail` AS SELECT u.id, u.email FROM users as u;
+CREATE  OR REPLACE VIEW `v_userByEmail` AS SELECT u.id, u.email, u.firstName, u.lastName FROM users as u;
 
 -- -----------------------------------------------------
 -- View `rest-resume-api`.`v_userLogin`
@@ -265,6 +265,8 @@ USE `rest-resume-api`;
 CREATE  OR REPLACE VIEW `v_userLogin` AS SELECT u.id, u.name, u.email, u.lastName, u.active, r.role
 FROM users as u
 inner join role as r on u.idRole = r.id;
+
+INSERT INTO `rest-resume-api`.`role` (`role`) VALUES ('Admin'), ('Recluiter'), ('Regular');
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

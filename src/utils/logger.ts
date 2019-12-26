@@ -1,4 +1,5 @@
 import * as winston from "winston";
+
 const { colorize, combine, timestamp, label, printf, json } = winston.format;
 const custom = {
     levels: {
@@ -22,6 +23,7 @@ const { NODE_ENV } = process.env;
 
 winston.addColors(custom.colors);
 export const myFormat = printf((info) => `[${info.timestamp}] [${info.level}] [38;5;13m[1m=>[22m[39m ${info.message}`);
+
 export const logger = winston.createLogger({
     levels: custom.levels,
     level: NODE_ENV === "production" ? "error" : "debug",

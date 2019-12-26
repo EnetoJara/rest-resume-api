@@ -2,6 +2,7 @@ import * as mysql from "mysql";
 import { Rows } from "resume-app";
 import { logger } from "../utils/logger";
 
+
 let pool: mysql.Pool;
 
 function getPool (): mysql.Pool {
@@ -18,15 +19,13 @@ function getPool (): mysql.Pool {
         dateStrings: true,
         stringifyObjects: true
     });
-
     pool.on("acquire", (conn: mysql.PoolConnection) => logger.debug(`ID: ${conn.threadId}`));
 
-    pool.on("connection", (conn: mysql.PoolConnection) => {
-        logger.debug(`STATE: ${conn.state}`);
-    });
     pool.on("release", (c: mysql.PoolConnection) => logger.debug(`connection release ${c.threadId}`));
 
-    pool.on("error", (err: mysql.MysqlError) => Object.keys(err).forEach((key: string) => logger.error(`${key}: ${err[key]}`)));
+    pool.on("error", (err: mysql.MysqlError) =>
+        Object.keys(err).forEach((key: string) => logger.error(`${key}: ${err[key]}`))
+    );
 
     pool.on("enqueue", (err: mysql.MysqlError) => {
         logger.error("we just ran out of connections </3");
@@ -59,6 +58,7 @@ export function getConnection (): Promise<mysql.PoolConnection> {
         })
     );
 }
+
 /**
  * @description Runs the given SQL statement passed as param.
  * @template T - Type of object the function will return.
@@ -74,7 +74,7 @@ export function runQuery<T> (connection: mysql.PoolConnection, sql: string, opts
         connection.query(sql, opts, (error: mysql.MysqlError | null, rows: Rows<T>) => {
             if (error !== null) {
                 logger.error(`ERROR RUNNING SQL: ${sql}`);
-
+                Object.keys(error).forEach((key: string) => logger.error(`${key}: ${error[key]}`));
                 return reject(error);
             }
 
@@ -82,6 +82,7 @@ export function runQuery<T> (connection: mysql.PoolConnection, sql: string, opts
         })
     );
 }
+
 /**
  * Begins transaction to perform queries and stuff.
  *
@@ -101,6 +102,7 @@ export function beginTransaction (connection: mysql.PoolConnection): Promise<mys
         })
     );
 }
+
 export function commitTransaction (connection: mysql.PoolConnection): Promise<void> {
     return new Promise((resolve, reject) =>
         connection.commit((err: mysql.MysqlError) => {

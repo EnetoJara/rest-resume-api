@@ -68,14 +68,18 @@ declare module "resume-app" {
     }
 
     interface LoginResponse {
-        id: number;
+        id?: number;
         email: string;
-        name: string;
-        middleName: string;
+        firstName: string;
+        secondName: string;
         lastName: string;
         secondLastName: string;
-        success: boolean;
-        token: string;
+        token?: string;
+    }
+
+    interface UserExists {
+        id: number;
+        email: string;
     }
 
     interface UserAttributes {

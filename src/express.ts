@@ -1,8 +1,12 @@
 import { json, urlencoded } from "body-parser";
+import * as compression from "compression";
+import * as cors from "cors";
 import * as express from "express";
+import * as helmet from "helmet";
 import * as morgan from "morgan";
 import { routes } from "./routes";
 import { logger } from "./utils/logger";
+
 /**
  * Creates an express instance.
  *
@@ -14,16 +18,15 @@ export function start (env: string): express.Application {
     const app: express.Application = express();
 
     if (env === "production") {
-        app.use(require("helmet")());
+        app.use(helmet());
         app.disable("x-powered-by");
-        app.use(require("csrf")());
-        app.use(require("compression")());
+        app.use(compression());
     } else {
-        app.use(require("cors")());
+        app.use(cors());
     }
     app.use(json());
     app.use(urlencoded({ extended: true }));
-    app.use(morgan("combined"));
+    app.use(morgan("dev"));
     app.use("/api", routes());
 
     return app;

@@ -4,21 +4,23 @@ import { LoginCredentials, RegisterCredentials } from "resume-app";
 import { UserController } from "./controllers";
 import { logger } from "./utils/logger";
 import { validateLogin, validateUserRegistration } from "./utils/validator";
+
 function log (req: Request, res: Response, next: NextFunction): void {
+  const {method} = req;
     logger.debug("-------------------------------------");
     logger.debug("-------------------------------------");
     logger.debug("-------------------------------------");
     logger.debug(`Timestamp: ${new Date().toISOString()}`);
     logger.debug(`IP: ${req.ip}`);
-    logger.debug(`Method: ${req.method}`);
+    logger.debug(`Method: ${method}`);
     logger.debug(`Url: ${req.url}`);
     logger.debug("-------------------------------------");
     logger.debug("-------------------------------------");
     logger.debug("-------------------------------------");
-    Object.keys(req.body).map((key) => console.debug(`${key}: ${req.body[key]}`));
 
     next();
 }
+
 /**
  * Validates the clients login credentials.
  * If the credentials had an error on them, the middleware will send a `BAD_REQUEST`
@@ -30,9 +32,9 @@ function log (req: Request, res: Response, next: NextFunction): void {
  * @returns login
  */
 function validLogin (req: Request, res: Response, next: NextFunction): void | Response {
+  logger.debug("-------------------------------------");
     logger.debug("Loggin validator Middleware");
-    logger.debug(`email: ${req.body.email}`);
-    const err = validateLogin(<LoginCredentials>req.body);
+    const err = validateLogin(req.body as LoginCredentials);
 
     if (err.length > 0) {
         return res.sendStatus(BAD_REQUEST);
@@ -52,9 +54,10 @@ function validLogin (req: Request, res: Response, next: NextFunction): void | Re
  * @returns login
  */
 function validRegister (req: Request, res: Response, next: NextFunction): void | Response {
-    logger.debug("register validator Middleware");
+  logger.debug("-------------------------------------");
+  logger.debug("register validator Middleware");
 
-    const errors = validateUserRegistration(<RegisterCredentials>req.body);
+    const errors = validateUserRegistration(req.body as RegisterCredentials);
 
     logger.debug(`errors found while validating the registration inputs ${errors.length}`);
 
@@ -69,12 +72,17 @@ function validRegister (req: Request, res: Response, next: NextFunction): void |
  * @returns {Router} api - endpoints of the app.
  */
 export function routes (): Router {
+  logger.debug("-------------------------------------");
+  logger.debug("routes");
+
     const api: Router = Router();
     const userController = new UserController();
 
-    api.post("/v1/login", [log, validLogin], userController.login);
+    const { login, register } = userController;
 
-    api.post("/v1/register", [log, validRegister], userController.register);
+    api.post("/v1/login", [log, validLogin], login);
+
+    api.post("/v1/register", [log, validRegister], register);
 
     return api;
 }

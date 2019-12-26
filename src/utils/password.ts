@@ -18,6 +18,7 @@ export function encriptPassword (password: string, salt: number): Promise<string
             throw error;
         });
 }
+
 /**
  * Compares the encrypted password from db with the one gived by the client.
  *
@@ -28,6 +29,7 @@ export function encriptPassword (password: string, salt: number): Promise<string
 export function isEqualsPassword (encrypted: string, text: string): Promise<boolean> {
     return bcrypt.compare(text, encrypted);
 }
+
 /**
  * Creates a new token for the user that just had login.
  *
@@ -37,6 +39,7 @@ export function isEqualsPassword (encrypted: string, text: string): Promise<bool
 export function createToken (userData: LoginResponse): string {
     return sign(userData, process.env.PRIVATE_KEY || "", { algorithm: "HS512", expiresIn: "1d" });
 }
+
 /**
  * Verifies if the given token is valid.
  *
@@ -44,5 +47,7 @@ export function createToken (userData: LoginResponse): string {
  * @returns {(UserModel | string)} token - user's encrypted information.
  */
 export function validateToken (token: string): UserAttributes | string {
-    return <UserAttributes>verify(token, process.env.PUBLIC_KEY || "", { algorithms: ["HS512"]});
+    const checked = verify(token, process.env.PUBLIC_KEY || "", { algorithms: ["HS512"] });
+
+    return checked as UserAttributes;
 }

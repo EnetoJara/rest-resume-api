@@ -1,5 +1,5 @@
 import { ErrorArray, JwtError, LoginCredentials, RegisterCredentials, ToValidate } from "resume-app";
-import { isAlpha, isAlphanumeric, isEmail, isEmpty, isLength } from "validator";
+import { isAlpha, isAlphanumeric, isEmail, isEmpty, isLength, isNumeric } from "validator";
 import { logger } from "./logger";
 import { loginMap, registerMap } from "./utility";
 
@@ -123,6 +123,7 @@ export function validateUserRegistration (user: RegisterCredentials): ErrorArray
 
     return errors;
 }
+
 /**
  * Determines whether token expired.
  *
@@ -132,12 +133,13 @@ export function validateUserRegistration (user: RegisterCredentials): ErrorArray
 export function isTokenExpired (error: JwtError): boolean {
     return ((error || {}).name || "") === "TokenExpiredError";
 }
+
 /**
  * Checks if the given input is a number.
  *
  * @param {*} param - input value.
  * @returns {boolean} `true` if the input is number.
  */
-export function isNumber (param: number): boolean {
-    return Number(param) === Number(param);
+export function isNumber (param): boolean {
+    return isNumeric(param);
 }

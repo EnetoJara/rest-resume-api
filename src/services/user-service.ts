@@ -3,6 +3,11 @@ import { Rows } from "resume-app";
 import { runQuery } from "../db/mysqls";
 import { UserModel } from "../models/user-model";
 import { logger } from "../utils/logger";
+
+
+
+
+
 /**
  * UserService class handles the logic needed to work with the users data.
  *
@@ -12,16 +17,16 @@ import { logger } from "../utils/logger";
  */
 export class UserService {
     /**
-   * Gets the user by email.
-   *
-   * @param {PoolConnection} connection - db connection.
-   * @param {String} email - email the user identifier.
-   * @returns {UserModel} user or empty array.
-   */
-    public getUserByEmail (connection: PoolConnection, email: string): Promise<UserModel | undefined> {
+     * Gets the user by email.
+     *
+     * @param {PoolConnection} connection - db connection.
+     * @param {String} email - email the user identifier.
+     * @returns {UserModel} user or empty array.
+     */
+    public getUserByEmail (connection: PoolConnection, email: string): Promise<object | undefined> {
         logger.debug(`email to search for: ${email}`);
 
-        return runQuery<UserModel>(connection, "select * from `v_userByEmail` where email = ;", email).then((res) => {
+        return runQuery<UserModel>(connection, "select * from `v_userByEmail` where email = ?;", email).then((res) => {
             if (res.length > 0) {
                 return res[0];
             }
@@ -31,8 +36,8 @@ export class UserService {
     }
 
     /**
-   * Save
-   */
+     * Save
+     */
     public save (connection: PoolConnection, user: UserModel): Promise<Rows<number>> {
         const { email, password, firstName, secondName, lastName, secondLastName, idRole } = user;
 
@@ -43,7 +48,7 @@ export class UserService {
             secondName,
             lastName,
             secondLastName,
-            idRole
+            Number(idRole)
         ]).then((row) => row);
     }
 }

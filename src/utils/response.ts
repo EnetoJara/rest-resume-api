@@ -1,5 +1,7 @@
 import { Response } from "express";
+
 import { getStatusText, NOT_ACCEPTABLE } from "http-status-codes";
+
 /**
  * @description Apis response
  *
