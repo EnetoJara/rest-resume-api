@@ -11,7 +11,6 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 -- -----------------------------------------------------
 -- Schema rest-resume-api
 -- -----------------------------------------------------
-DROP database `rest-resume-api`;
 CREATE SCHEMA IF NOT EXISTS `rest-resume-api` DEFAULT CHARACTER SET utf8 ;
 USE `rest-resume-api` ;
 
@@ -21,7 +20,7 @@ USE `rest-resume-api` ;
 CREATE TABLE IF NOT EXISTS `rest-resume-api`.`role` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `role` VARCHAR(45) NOT NULL,
-  `createdAt` TIMESTAMP NOT NULL DEFAULT now(),
+  `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `idrole_UNIQUE` (`id` ASC),
   UNIQUE INDEX `rolecol_UNIQUE` (`role` ASC))
@@ -40,7 +39,7 @@ CREATE TABLE IF NOT EXISTS `rest-resume-api`.`users` (
   `lastName` VARCHAR(50) NOT NULL,
   `secondLastName` VARCHAR(50) NULL,
   `active` TINYINT(1) NOT NULL DEFAULT 0,
-  `createdAt` TIMESTAMP NOT NULL,
+  `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `idRole` INT NOT NULL,
   PRIMARY KEY (`id`, `idRole`),
   UNIQUE INDEX `username_UNIQUE` (`email` ASC),
@@ -64,7 +63,7 @@ CREATE TABLE IF NOT EXISTS `rest-resume-api`.`education` (
   `endDate` DATE NOT NULL,
   `isCurrent` TINYINT(1) NOT NULL,
   `idUsers` INT NOT NULL,
-  `createdAt` TIMESTAMP NOT NULL,
+  `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `ideducation_UNIQUE` (`id` ASC),
   INDEX `fk_education_users1_idx` (`idUsers` ASC),
@@ -111,7 +110,7 @@ CREATE TABLE IF NOT EXISTS `rest-resume-api`.`social_media` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NOT NULL,
   `url` VARCHAR(250) NOT NULL,
-  `createdAt` TIMESTAMP NOT NULL,
+  `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `idUsers` INT NOT NULL,
   PRIMARY KEY (`id`, `idUsers`),
   UNIQUE INDEX `idsocialMedia_UNIQUE` (`id` ASC),
@@ -137,6 +136,7 @@ CREATE TABLE IF NOT EXISTS `rest-resume-api`.`information` (
   `married` TINYINT(1) NOT NULL,
   `bio` VARCHAR(250) NOT NULL,
   `users_idusers` INT NOT NULL,
+  `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   INDEX `fk_information_users1_idx` (`users_idusers` ASC),
   CONSTRAINT `fk_information_users1`
@@ -155,6 +155,7 @@ CREATE TABLE IF NOT EXISTS `rest-resume-api`.`fieldsOfInterests` (
   `role` VARCHAR(50) NOT NULL,
   `industry` VARCHAR(50) NOT NULL,
   `idUsers` INT NOT NULL,
+  `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`, `idUsers`),
   INDEX `fk_fieldsOfInterests_users1_idx` (`idUsers` ASC),
   CONSTRAINT `fk_fieldsOfInterests_users1`
@@ -207,35 +208,64 @@ CREATE TABLE IF NOT EXISTS `rest-resume-api`.`user_has_followers` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
+USE `rest-resume-api` ;
+
+-- -----------------------------------------------------
+-- Placeholder table for view `rest-resume-api`.`v_getRoles`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `rest-resume-api`.`v_getRoles` (`id` INT, `role` INT);
+
+-- -----------------------------------------------------
+-- Placeholder table for view `rest-resume-api`.`v_userByEmail`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `rest-resume-api`.`v_userByEmail` (`id` INT, `email` INT);
+
+-- -----------------------------------------------------
+-- Placeholder table for view `rest-resume-api`.`v_userLogin`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `rest-resume-api`.`v_userLogin` (`id` INT, `name` INT, `email` INT, `lastName` INT, `active` INT, `role` INT);
+
+-- -----------------------------------------------------
+-- procedure sp_saveUser
+-- -----------------------------------------------------
+
+DELIMITER $$
+USE `rest-resume-api`$$
+CREATE PROCEDURE `sp_saveUser` (in _email varchar(50), in _password varchar(100), in _firstName varchar(50), in _secondName varchar(50), in _lastName varchar(50), in _secondLastName varchar(50), in _recluiter int)
+BEGIN
+
+	INSERT INTO users (email,   password,  firstName,  secondName,  lastName,  secondLastName, active,  idRole,    createdAt) 
+    VALUES 			  (_email, _password, _firstName, _secondName, _lastName, _secondLastName,      0, _recluiter, now());
+    
+    SELECT LAST_INSERT_ID();
+
+END$$
+
+DELIMITER ;
+
+-- -----------------------------------------------------
+-- View `rest-resume-api`.`v_getRoles`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `rest-resume-api`.`v_getRoles`;
+USE `rest-resume-api`;
+CREATE  OR REPLACE VIEW `v_getRoles` AS SELECT id, role FROM role;
+
+-- -----------------------------------------------------
+-- View `rest-resume-api`.`v_userByEmail`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `rest-resume-api`.`v_userByEmail`;
+USE `rest-resume-api`;
+CREATE  OR REPLACE VIEW `v_userByEmail` AS SELECT u.id, u.email FROM users as u;
+
+-- -----------------------------------------------------
+-- View `rest-resume-api`.`v_userLogin`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `rest-resume-api`.`v_userLogin`;
+USE `rest-resume-api`;
+CREATE  OR REPLACE VIEW `v_userLogin` AS SELECT u.id, u.name, u.email, u.lastName, u.active, r.role
+FROM users as u
+inner join role as r on u.idRole = r.id;
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
-INSERT INTO `rest-resume-api`.`role` (`id`, `role`, `createdAt`) VALUES ('1', 'Admin', now());
-INSERT INTO `rest-resume-api`.`role` (`id`, `role`, `createdAt`) VALUES ('2', 'Recruiter', NOW());
-INSERT INTO `rest-resume-api`.`role` (`id`, `role`, `createdAt`) VALUES ('3', 'Regular', NOW());
-
-DROP procedure if exists `get_roles`;
-
-DELIMITER $$
-USE `rest-resume-api`$$
-CREATE PROCEDURE `get_roles` ()
-BEGIN
-SELECT * FROM role;
-END$$
-
-DELIMITER ;
-
-USE `rest-resume-api`;
-DROP procedure IF EXISTS `getUserByEmail`;
-
-DELIMITER $$
-USE `rest-resume-api`$$
-CREATE PROCEDURE `getUserByEmail` (in _email varchar(50) )
-BEGIN
-	select * from users where email = _email;
-END$$
-
-DELIMITER ;
-

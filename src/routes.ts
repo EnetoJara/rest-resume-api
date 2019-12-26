@@ -1,13 +1,9 @@
 import { NextFunction, Request, Response, Router } from "express";
-import { BAD_REQUEST, getStatusText, INTERNAL_SERVER_ERROR } from "http-status-codes";
-import { PoolConnection } from "mysql";
-import { LoginCredentials } from "resume-app";
+import { BAD_REQUEST, getStatusText } from "http-status-codes";
+import { LoginCredentials, RegisterCredentials } from "resume-app";
 import { UserController } from "./controllers";
-import { MySQL } from "./db/mysqls";
-import { UserService } from "./services";
 import { logger } from "./utils/logger";
-import { validateLogin } from "./utils/validator";
-
+import { validateLogin, validateUserRegistration } from "./utils/validator";
 function log (req: Request, res: Response, next: NextFunction): void {
     logger.debug("-------------------------------------");
     logger.debug("-------------------------------------");
@@ -19,40 +15,66 @@ function log (req: Request, res: Response, next: NextFunction): void {
     logger.debug("-------------------------------------");
     logger.debug("-------------------------------------");
     logger.debug("-------------------------------------");
+    Object.keys(req.body).map((key) => console.debug(`${key}: ${req.body[key]}`));
+
     next();
 }
-
-function openConnection (pool: MySQL, endPoint: (req: Request, res: Response, connection: PoolConnection)=>void) {
-    return async function api (req: Request, res: Response) {
-        return pool.getNewConnection().then((conn: PoolConnection) => {
-            return endPoint(req, res, conn);
-        }).catch((error: any) => {
-            logger.error(`ERROR MIDDLEWARE OPEN CONNECTION`);
-            Object.keys(error).map((i: string) => logger.error(`${error[i]}`));
-
-            return res.status(INTERNAL_SERVER_ERROR).send({success: false, message: getStatusText(INTERNAL_SERVER_ERROR)});
-        })
-    }
-}
+/**
+ * Validates the clients login credentials.
+ * If the credentials had an error on them, the middleware will send a `BAD_REQUEST`
+ * back to the client, other wise it will call the login handler.
+ *
+ * @param {import("express").Request} req - Request Object.
+ * @param {import("express").Response} res - Response Object.
+ * @param {import("express").NextFunction} next - NextFunction middleware.
+ * @returns login
+ */
 function validLogin (req: Request, res: Response, next: NextFunction): void | Response {
+    logger.debug("Loggin validator Middleware");
+    logger.debug(`email: ${req.body.email}`);
     const err = validateLogin(<LoginCredentials>req.body);
 
-    if (err.length < 0) {
-        return res.status(BAD_REQUEST).send({ success: false, message: getStatusText(BAD_REQUEST), errors: err });
+    if (err.length > 0) {
+        return res.sendStatus(BAD_REQUEST);
     }
 
     return next();
 }
+
+/**
+ * Validates the clients login credentials.
+ * If the credentials had an error on them, the middleware will send a `BAD_REQUEST`
+ * back to the client, other wise it will call the login handler.
+ *
+ * @param {import("express").Request} req - Request Object.
+ * @param {import("express").Response} res - Response Object.
+ * @param {import("express").NextFunction} next - NextFunction middleware.
+ * @returns login
+ */
+function validRegister (req: Request, res: Response, next: NextFunction): void | Response {
+    logger.debug("register validator Middleware");
+
+    const errors = validateUserRegistration(<RegisterCredentials>req.body);
+
+    logger.debug(`errors found while validating the registration inputs ${errors.length}`);
+
+    return errors.length > 0
+        ? res.status(BAD_REQUEST).send({ success: false, message: getStatusText(BAD_REQUEST), errors })
+        : next();
+}
+
 /**
  * Sets the controllers with there corresponding url.
  *
  * @returns {Router} api - endpoints of the app.
  */
-export function routes (db: MySQL): Router {
+export function routes (): Router {
     const api: Router = Router();
-    const userController = new UserController(new UserService(db));
+    const userController = new UserController();
 
-    api.get("/v1/login", [log, validLogin], openConnection(db, userController.login));
+    api.post("/v1/login", [log, validLogin], userController.login);
+
+    api.post("/v1/register", [log, validRegister], userController.register);
 
     return api;
 }

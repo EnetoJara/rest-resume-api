@@ -1,18 +1,38 @@
-import { ErrorArray, JwtError, LoginCredentials, UserRegister } from "resume-app";
+import { ErrorArray, JwtError, LoginCredentials, RegisterCredentials, ToValidate } from "resume-app";
 import { isAlpha, isAlphanumeric, isEmail, isEmpty, isLength } from "validator";
 import { logger } from "./logger";
+import { loginMap, registerMap } from "./utility";
+
+/**
+ * Checks the payloads received from the client to see if there are some, unknown props.
+ *
+ * @param {ToValidate} fromClient - Object received from client.
+ * @param {ToValidate} valids - Expected and only props.
+ * @returns {ErrorArray[]} array with errors if any found.
+ */
+function notRequested (fromClient: ToValidate, valids: ToValidate): ErrorArray[] {
+    return Object.keys(fromClient)
+        .filter((key: string) => !valids[key])
+        .map((i: string) => ({ [i]: "unknown property, please limit your self to send just the needed fields" }));
+}
+
 /**
  * Middleware that validates the login credentials of a user.
  *
  * @param {LoginCredentials} credentials - email and password of the user.
  * @returns {Array} array of errors found
  */
+export function validateLogin (credentials: LoginCredentials): ErrorArray[] {
+    const errors = notRequested(credentials, loginMap);
 
-export function validateLogin (credentials: LoginCredentials): Array<ErrorArray> {
-    logger.info("validateLogin");
-    const errors = new Array<ErrorArray>();
+    if (errors.length > 0) {
+        return errors;
+    }
+
     const { email = "", password = "" } = credentials;
 
+    logger.debug(`EMAIL: ${email}`);
+    logger.debug(`PASSWORD: ${password}`);
     if (isEmpty(email)) {
         errors.push({ email: "email is required" });
     } else if (!isEmail(email)) {
@@ -26,20 +46,26 @@ export function validateLogin (credentials: LoginCredentials): Array<ErrorArray>
 
     return errors;
 }
+
 /**
  * Validates if the client input to save a new user is valid.
  *
- * @param {UserRegister} user - User Model.
+ * @param {RegisterCredentials
+ * } user - User Model.
  * @returns {Array} array - of errors found.
  */
-export function validateUserRegistration (user: UserRegister): Array<ErrorArray> {
-    const errors = new Array<ErrorArray>();
+export function validateUserRegistration (user: RegisterCredentials): ErrorArray[] {
+    const errors = notRequested(user, registerMap);
+
+    if (errors.length > 0) {
+        return errors;
+    }
     const {
         email = "",
         password = "",
         password2 = "",
-        name = "",
-        middleName = "",
+        firstName = "",
+        secondName = "",
         lastName = "",
         secondLastName = ""
     } = user;
@@ -60,22 +86,22 @@ export function validateUserRegistration (user: UserRegister): Array<ErrorArray>
     } else if (password !== password2) {
         errors.push({ password2: "passwords  must match" });
     }
-    if (isEmpty(name)) {
-        errors.push({ name: "name is Required" });
-    } else if (!isAlpha(name)) {
+    if (isEmpty(firstName)) {
+        errors.push({ firstName: "name is Required" });
+    } else if (!isAlpha(firstName)) {
         errors.push({
-            name: "is you a rotob, how come you dont have an standard name"
+            firstName: "is you a rotob, how come you dont have an standard firstName"
         });
-    } else if (!isLength(name, { min: 1, max: 50 })) {
-        errors.push({ name: "name must be less than 50 chars" });
+    } else if (!isLength(firstName, { min: 1, max: 50 })) {
+        errors.push({ firstName: "name must be less than 50 chars" });
     }
-    if (!isEmpty(middleName) && !isAlpha(middleName)) {
+    if (!isEmpty(secondName) && !isAlpha(secondName)) {
         errors.push({
-            middleName: "middlename should be valid"
+            secondName: "secondName should be valid"
         });
-    } else if (!isEmpty(middleName) && !isLength(middleName, { min: 1, max: 50 })) {
+    } else if (!isEmpty(secondName) && !isLength(secondName, { min: 1, max: 50 })) {
         errors.push({
-            middleName: "middlename should not be greater than 50 characters"
+            secondName: "secondName should not be greater than 50 characters"
         });
     }
     if (isEmpty(lastName)) {

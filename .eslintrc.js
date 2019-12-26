@@ -114,7 +114,6 @@ module.exports = {
     "template-curly-spacing": "error",
 
 	"padding-line-between-statements": ["error",
-	{ blankLine: "never",    prev: "*", next: "*" },
 	{ blankLine: "always", prev: "*", next: ["return"] },
     { blankLine: "always", prev: "directive", next: "*" },
 	{ blankLine: "always", prev: "directive", next: "*" },

@@ -1,15 +1,10 @@
-import fs from "fs";
-import http from "http";
-import path from "path";
+require("../tools/env")();
 import { start } from "./express";
-export const privateKey = fs.readFileSync(path.join(__dirname, "../private.key"), "utf8");
-export const publicKEY = fs.readFileSync(path.join(__dirname, "../public.key"), "utf8");
 
-const { NODE_ENV, PORT = 5000 } = process.env;
+const { NODE_ENV, ENETO_PORT = 5000 } = process.env;
 const app = start(NODE_ENV || "development");
-const server = http.createServer(app);
 
-server.listen(Number(PORT)||5000, () => {
+app.listen(Number(ENETO_PORT) || 5000, () => {
     console.log("starting");
-    console.log(`running server at: http:localhost:${PORT}`);
+    console.log(`running server at: http:localhost:${ENETO_PORT}`);
 });

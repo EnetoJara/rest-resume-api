@@ -1,4 +1,4 @@
-import winston from "winston";
+import * as winston from "winston";
 const { colorize, combine, timestamp, label, printf, json } = winston.format;
 const custom = {
     levels: {
@@ -29,6 +29,7 @@ export const logger = winston.createLogger({
         label({ label: "order-api errors" }),
         timestamp(),
         colorize({ colors: custom.colors }),
+
         json(),
         myFormat
     ),
@@ -36,7 +37,6 @@ export const logger = winston.createLogger({
     transports: [
         new winston.transports.File({ filename: "info.log", level: "debug" }),
         new winston.transports.File({ filename: "error.log", level: "error" }),
-        new winston.transports.Http({ host: "localhost", port: 5000, path: "/api/v1/login" }),
         new winston.transports.Console({ level: NODE_ENV === "production" ? "error" : "debug" })
     ]
 });

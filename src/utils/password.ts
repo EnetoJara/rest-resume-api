@@ -1,7 +1,7 @@
-import bcrypt from "bcrypt";
+import * as bcrypt from "bcrypt";
 import { sign, verify } from "jsonwebtoken";
-import { LoginResponse, UserModel } from "resume-app";
-import { privateKey, publicKEY } from "../index";
+import { LoginResponse, UserAttributes } from "resume-app";
+
 /**
  * Generates an encripted password for the user.
  *
@@ -35,7 +35,7 @@ export function isEqualsPassword (encrypted: string, text: string): Promise<bool
  * @returns {string} token - user's encrypted information.
  */
 export function createToken (userData: LoginResponse): string {
-    return sign(userData, privateKey, { algorithm: "HS512", expiresIn: "1d" });
+    return sign(userData, process.env.PRIVATE_KEY || "", { algorithm: "HS512", expiresIn: "1d" });
 }
 /**
  * Verifies if the given token is valid.
@@ -43,6 +43,6 @@ export function createToken (userData: LoginResponse): string {
  * @param {string} token - user's encrypted info.
  * @returns {(UserModel | string)} token - user's encrypted information.
  */
-export function validateToken (token: string): UserModel | string {
-    return <UserModel>verify(token, publicKEY, { algorithms: ["HS512"]});
+export function validateToken (token: string): UserAttributes | string {
+    return <UserAttributes>verify(token, process.env.PUBLIC_KEY || "", { algorithms: ["HS512"]});
 }

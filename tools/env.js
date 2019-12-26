@@ -6,6 +6,10 @@ const path = require('path');
 require('dotenv-expand')(
     require('dotenv').config({ path: path.join(__dirname, "../.env") }));
 
+const privateKey = fs.readFileSync(path.join(__dirname, "../private.key"), "utf8");
+const publicKEY = fs.readFileSync(path.join(__dirname, "../public.key"), "utf8");
+
+
 const appDirectory = fs.realpathSync(process.cwd());
 process.env.NODE_PATH = (process.env.NODE_PATH || '')
     .split(path.delimiter)
@@ -26,6 +30,8 @@ function setVariables (publicUrl = "/") {
             {
                 NODE_ENV: process.env.NODE_ENV || 'development',
                 PUBLIC_URL: publicUrl,
+                PRIVATE_KEY: privateKey,
+                PUBLIC_KEY: publicKEY
             }
         );
 
@@ -35,7 +41,7 @@ function setVariables (publicUrl = "/") {
             return env;
         }, {}),
     };
-
+console.log('stringified: ', stringified);
     return { raw, stringified };
 }
 

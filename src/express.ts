@@ -1,16 +1,17 @@
 import { json, urlencoded } from "body-parser";
-import { Application, default as express } from "express";
-import { MySQL } from "./db/mysqls";
+import * as express from "express";
+import * as morgan from "morgan";
 import { routes } from "./routes";
+import { logger } from "./utils/logger";
 /**
  * Creates an express instance.
  *
  * @param {string} env - environment in which the app will run.
  * @returns {Application} express instance.
  */
-export function start (env: string): Application {
-    const app: Application = express();
-    const db: MySQL = new MySQL();
+export function start (env: string): express.Application {
+    logger.debug(`App running as ${env}`);
+    const app: express.Application = express();
 
     if (env === "production") {
         app.use(require("helmet")());
@@ -22,7 +23,8 @@ export function start (env: string): Application {
     }
     app.use(json());
     app.use(urlencoded({ extended: true }));
-    app.use("/api", routes(db));
+    app.use(morgan("combined"));
+    app.use("/api", routes());
 
     return app;
 }

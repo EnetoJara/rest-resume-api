@@ -3,8 +3,9 @@ version: '3.3'
 services:
   db:
     image: mysql
-    restart: always
     command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - ./mysql-dump:/docker-entrypoint-initdb.d
     environment:
       MYSQL_DATABASE: 'rest-resume-api'
       MYSQL_USER: 'root'
@@ -13,7 +14,3 @@ services:
       - '3306:3306'
     expose:
       - '3306'
-    volumes:
-      - my-db:/var/lib/mysql2
-volumes:
-  my-db:

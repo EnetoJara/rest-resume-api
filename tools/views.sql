@@ -1,0 +1,1 @@
+CREATE VIEW `v_getRoles` AS SELECT id, role FROM role;

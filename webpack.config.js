@@ -1,4 +1,4 @@
-const envs = require('./env');
+const envs = require('./tools/env');
 const path = require('path');
 const webpack = require('webpack');
 const nodeExternals = require('webpack-node-externals');
@@ -8,7 +8,7 @@ const { NODE_ENV } = process.env;
 
 const entry = "./src/index.ts";
 const { stringified } = envs();
-module.exports = () => ({
+module.exports = {
 	target: 'node',
 	node: {
 		__filename: false,
@@ -72,4 +72,4 @@ module.exports = () => ({
 	plugins: [
 		new webpack.DefinePlugin(stringified)
 	]
-});
+};
