@@ -62,11 +62,6 @@ declare module "resume-app" {
         idRole: number;
     }
 
-    interface LoginCredentials {
-        email: string;
-        password: string;
-    }
-
     interface LoginResponse {
         id?: number;
         email: string;
@@ -96,4 +91,34 @@ declare module "resume-app" {
     }
 
     type ToValidate = LoginCredentials | RegisterCredentials;
+
+    interface SkillAtttributes {
+        id: number;
+        skill: string;
+        percentage: number;
+        years: number;
+        idUsers: number;
+    }
+
+    interface UserSkills {
+        id: number;
+        skill: string;
+        idUsers: number;
+    }
+
+    interface LoginCredentials {
+        email: string;
+        password: string;
+    }
+
+    interface UserByEmail {
+        id: number;
+        email: string;
+        password: string;
+        firstName: string;
+        secondName: string;
+        lastName: string;
+        lastSecondName: string;
+        role: number;
+    }
 }

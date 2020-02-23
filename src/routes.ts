@@ -2,6 +2,7 @@ import { NextFunction, Request, Response, Router } from "express";
 import { BAD_REQUEST, getStatusText } from "http-status-codes";
 import { LoginCredentials, RegisterCredentials } from "resume-app";
 import { UserController } from "./controllers";
+import { SkillsController } from "./controllers/skills-controller";
 import { logger } from "./utils/logger";
 import { validateLogin, validateUserRegistration } from "./utils/validator";
 
@@ -77,12 +78,19 @@ export function routes (): Router {
 
     const api: Router = Router();
     const userController = new UserController();
+    const skillsController = new SkillsController();
 
-    const { login, register } = userController;
+    const { login, getLogin, register, getRegister } = userController;
 
-    api.post("/v1/login", [log, validLogin], login);
+    api.route("/v1/login")
+        .post([log, validLogin], login)
+        .get(getLogin);
 
-    api.post("/v1/register", [log, validRegister], register);
+    api.route("/v1/register")
+        .get(getRegister)
+        .post([log, validRegister], register);
+
+    api.route("/v1/skills/:userId").get(skillsController.getSkillsByUserId);
 
     return api;
 }

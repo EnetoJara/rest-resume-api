@@ -112,14 +112,14 @@
     "[typescript]": {
         "editor.defaultFormatter": "vscode.typescript-language-features"
     },
-    "workbench.colorTheme": "enetito-theme",
+    "workbench.colorTheme": "eneto-ui",
     "editor.fontFamily": "'Fira Code iScript', 'Operator Mono', 'Cascadia Code'",
     "editor.acceptSuggestionOnCommitCharacter": true,
     "editor.autoSurround": "languageDefined",
     "autoimport.doubleQuotes": true,
     "editor.suggest.showColors": true,
     "editor.fontLigatures": true,
-    "terminal.integrated.fontFamily": "Cascadia Code",
+    "terminal.integrated.fontFamily": "Fira Code",
     "[jsonc]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },

@@ -37,6 +37,8 @@ export function isEqualsPassword (encrypted: string, text: string): Promise<bool
  * @returns {string} token - user's encrypted information.
  */
 export function createToken (userData: LoginResponse): string {
+    console.log('userData: ', userData);
+    console.log('private.env.PRIVATE_KEY: ', process.env.PRIVATE_KEY);
     return sign(userData, process.env.PRIVATE_KEY || "", { algorithm: "HS512", expiresIn: "1d" });
 }
 

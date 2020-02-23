@@ -42,3 +42,8 @@ export const logger = winston.createLogger({
         new winston.transports.Console({ level: NODE_ENV === "production" ? "error" : "debug" })
     ]
 });
+
+
+export function displayError (error: Error): void {
+    Object.keys(error).forEach(key=>logger.debug(`${error[key]}`))
+}

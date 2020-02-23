@@ -1,8 +1,11 @@
+
 -- MySQL Workbench Forward Engineering
 
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
+
+BEGIN;
 
 -- -----------------------------------------------------
 -- Schema rest-resume-api
@@ -21,6 +24,7 @@ CREATE TABLE IF NOT EXISTS `rest-resume-api`.`role` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `role` VARCHAR(45) NOT NULL,
   `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `editedAt`TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `idrole_UNIQUE` (`id` ASC),
   UNIQUE INDEX `rolecol_UNIQUE` (`role` ASC))
@@ -40,6 +44,7 @@ CREATE TABLE IF NOT EXISTS `rest-resume-api`.`users` (
   `secondLastName` VARCHAR(50) NULL,
   `active` TINYINT(1) NOT NULL DEFAULT 0,
   `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `editedAt`TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `idRole` INT NOT NULL,
   PRIMARY KEY (`id`, `idRole`),
   UNIQUE INDEX `username_UNIQUE` (`email` ASC),
@@ -64,6 +69,7 @@ CREATE TABLE IF NOT EXISTS `rest-resume-api`.`education` (
   `isCurrent` TINYINT(1) NOT NULL,
   `idUsers` INT NOT NULL,
   `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `editedAt`TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `ideducation_UNIQUE` (`id` ASC),
   INDEX `fk_education_users1_idx` (`idUsers` ASC),
@@ -91,7 +97,8 @@ CREATE TABLE IF NOT EXISTS `rest-resume-api`.`experience` (
   `bossPhone` VARCHAR(45) NOT NULL,
   `shouldDyspayBossInfo` TINYINT(1) NOT NULL DEFAULT 0,
   `idUsers` INT NOT NULL,
-  `createdAt` TIMESTAMP NOT NULL,
+  `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `editedAt`TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `idexperience_UNIQUE` (`id` ASC),
   INDEX `fk_experience_users1_idx` (`idUsers` ASC),
@@ -111,6 +118,7 @@ CREATE TABLE IF NOT EXISTS `rest-resume-api`.`social_media` (
   `name` VARCHAR(45) NOT NULL,
   `url` VARCHAR(250) NOT NULL,
   `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `editedAt`TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `idUsers` INT NOT NULL,
   PRIMARY KEY (`id`, `idUsers`),
   UNIQUE INDEX `idsocialMedia_UNIQUE` (`id` ASC),
@@ -136,7 +144,8 @@ CREATE TABLE IF NOT EXISTS `rest-resume-api`.`information` (
   `married` TINYINT(1) NOT NULL,
   `bio` VARCHAR(250) NOT NULL,
   `users_idusers` INT NOT NULL,
-  `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+`createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `editedAt`TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   INDEX `fk_information_users1_idx` (`users_idusers` ASC),
   CONSTRAINT `fk_information_users1`
@@ -156,6 +165,7 @@ CREATE TABLE IF NOT EXISTS `rest-resume-api`.`fieldsOfInterests` (
   `industry` VARCHAR(50) NOT NULL,
   `idUsers` INT NOT NULL,
   `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `editedAt`TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`, `idUsers`),
   INDEX `fk_fieldsOfInterests_users1_idx` (`idUsers` ASC),
   CONSTRAINT `fk_fieldsOfInterests_users1`
@@ -172,9 +182,11 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `rest-resume-api`.`skills` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `skill` VARCHAR(100) NOT NULL,
-  `percentage` SMALLINT NOT NULL,
+  `percentage` double NOT NULL,
   `years` SMALLINT NOT NULL,
   `idUsers` INT NOT NULL,
+  `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `editedAt`TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   INDEX `fk_skills_users1_idx` (`idUsers` ASC),
   CONSTRAINT `fk_skills_users1`
@@ -193,6 +205,8 @@ CREATE TABLE IF NOT EXISTS `rest-resume-api`.`user_has_followers` (
   `idFollowed` INT NOT NULL,
   `idFollower` INT NOT NULL,
   `startsFollogin` TIMESTAMP NOT NULL DEFAULT NOW(),
+  `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `editedAt`TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`, `idFollowed`, `idFollower`),
   INDEX `fk_users_has_users_users2_idx` (`idFollower` ASC),
   INDEX `fk_users_has_users_users1_idx` (`idFollowed` ASC),
@@ -208,34 +222,24 @@ CREATE TABLE IF NOT EXISTS `rest-resume-api`.`user_has_followers` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
-USE `rest-resume-api` ;
-
--- -----------------------------------------------------
--- Placeholder table for view `rest-resume-api`.`v_getRoles`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `rest-resume-api`.`v_getRoles` (`id` INT, `role` INT);
-
--- -----------------------------------------------------
--- Placeholder table for view `rest-resume-api`.`v_userByEmail`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `rest-resume-api`.`v_userByEmail` (`id` INT, `email` INT, `firstName` INT, `lastName` INT);
-
--- -----------------------------------------------------
--- Placeholder table for view `rest-resume-api`.`v_userLogin`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `rest-resume-api`.`v_userLogin` (`id` INT, `name` INT, `email` INT, `lastName` INT, `active` INT, `role` INT);
-
 -- -----------------------------------------------------
 -- procedure sp_saveUser
 -- -----------------------------------------------------
 
 DELIMITER $$
 USE `rest-resume-api`$$
-CREATE PROCEDURE `sp_saveUser` (in _email varchar(50), in _password varchar(100), in _firstName varchar(50), in _secondName varchar(50), in _lastName varchar(50), in _secondLastName varchar(50), in _recluiter int)
+CREATE PROCEDURE `sp_save_user` (
+	in _email varchar(50),
+    in _password varchar(100),
+    in _firstName varchar(50),
+    in _secondName varchar(50),
+    in _lastName varchar(50),
+    in _secondLastName varchar(50),
+    in _recluiter int)
 BEGIN
 
-	INSERT INTO users (email,   password,  firstName,  secondName,  lastName,  secondLastName, active,  idRole,    createdAt)
-    VALUES 			  (_email, _password, _firstName, _secondName, _lastName, _secondLastName,      0, _recluiter, now());
+	INSERT INTO users (email,   password,  firstName,  secondName,  lastName,  secondLastName, active,  idRole)
+    VALUES 			  (_email, _password, _firstName, _secondName, _lastName, _secondLastName,      0, _recluiter );
 
     SELECT LAST_INSERT_ID();
 
@@ -243,28 +247,15 @@ END$$
 
 DELIMITER ;
 
--- -----------------------------------------------------
--- View `rest-resume-api`.`v_getRoles`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `rest-resume-api`.`v_getRoles`;
-USE `rest-resume-api`;
 CREATE  OR REPLACE VIEW `v_getRoles` AS SELECT id, role FROM role;
 
--- -----------------------------------------------------
--- View `rest-resume-api`.`v_userByEmail`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `rest-resume-api`.`v_userByEmail`;
-USE `rest-resume-api`;
-CREATE  OR REPLACE VIEW `v_userByEmail` AS SELECT u.id, u.email, u.firstName, u.lastName FROM users as u;
+CREATE  OR REPLACE VIEW `v_user_by_email` AS SELECT u.idRole as role, u.password as password, u.id as id, u.email as email, u.firstName as firstName, u.secondName as secondName, u.lastName as lastName, u.secondLastName as secondLastName, u.active as active FROM users as u;
 
--- -----------------------------------------------------
--- View `rest-resume-api`.`v_userLogin`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `rest-resume-api`.`v_userLogin`;
-USE `rest-resume-api`;
-CREATE  OR REPLACE VIEW `v_userLogin` AS SELECT u.id, u.name, u.email, u.lastName, u.active, r.role
+CREATE  OR REPLACE VIEW `v_user_login` AS SELECT u.id as id, u.email as email
 FROM users as u
 inner join role as r on u.idRole = r.id;
+
+CREATE OR REPLACE VIEW `v_user_skills` AS SELECT s.id, s.skill, s.idUsers FROM skills as s inner join users as u on s.idUsers = u.id;
 
 INSERT INTO `rest-resume-api`.`role` (`role`) VALUES ('Admin'), ('Recluiter'), ('Regular');
 

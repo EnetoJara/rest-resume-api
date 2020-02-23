@@ -1,4 +1,6 @@
-export class UserModel {
+import { UserAttributes } from "resume-app";
+
+export class UserModel implements UserAttributes {
     public id?: number;
     public firstName: string;
     public email: string;

@@ -18,19 +18,18 @@ function getPool (): mysql.Pool {
         dateStrings: true,
         stringifyObjects: true
     });
-    pool.on("acquire", (conn: mysql.PoolConnection) => logger.debug(`ID: ${conn.threadId}`));
+    pool.on("acquire", (conn: mysql.PoolConnection) => logger.debug(`ADQUIRE: ${conn.threadId}`));
 
-    pool.on("release", (c: mysql.PoolConnection) => logger.debug(`connection release ${c.threadId}`));
+    pool.on("release", (c: mysql.PoolConnection) => logger.debug(`RELEASE ${c.threadId}`));
 
     pool.on("error", (err: mysql.MysqlError) =>
-        Object.keys(err).forEach((key: string) => logger.error(`${key}: ${err[key]}`))
+        Object.keys(err).forEach((key: string) => logger.error(`ERROR: ${key}: ${err[key]}`))
     );
 
     pool.on("enqueue", (err: mysql.MysqlError) => {
-        logger.error("we just ran out of connections </3");
         if (err) {
             Object.entries(err).forEach(([key, value]) => {
-                logger.error(`${key}: ${value}`);
+                logger.error(`ENQUEUE: ${key}: ${value}`);
             });
         }
     });
@@ -61,19 +60,17 @@ export function getConnection (): Promise<mysql.PoolConnection> {
 /**
  * @description Runs the given SQL statement passed as param.
  * @template T - Type of object the function will return.
- * @param {mysql.PoolConnection} connection - db connection.
+ * @param {import("mysql").PoolConnection} connection - db connection.
  * @param {string} sql - SQL statement to be exectuted.
  * @param {*} [opts] opts - array of parameters to be injected at the sql statement.
  * @returns {Rows<T>} query - data fetched from db.
  */
-export function runQuery<T> (connection: mysql.PoolConnection, sql: string, opts): Promise<Rows<T>> {
+export function runQuery<T> (connection: mysql.PoolConnection, sql: string, opts?): Promise<Rows<T>> {
     logger.debug(`RunQuery ${sql}`);
 
     return new Promise((resolve, reject) =>
         connection.query(sql, opts, (error: mysql.MysqlError | null, rows: Rows<T>) => {
             if (error !== null) {
-                logger.error(`ERROR RUNNING SQL: ${sql}`);
-                Object.keys(error).forEach((key: string) => logger.error(`${key}: ${error[key]}`));
                 return reject(error);
             }
 
@@ -85,8 +82,8 @@ export function runQuery<T> (connection: mysql.PoolConnection, sql: string, opts
 /**
  * Begins transaction to perform queries and stuff.
  *
- * @param {mysql.PoolConnection} connection - db thread.
- * @returns {mysql.PoolConnection} transaction - db connection with a transaction started.
+ * @param {import("mysql").PoolConnection} connection - db thread.
+ * @returns {import("mysql").PoolConnection} transaction - db connection with a transaction started.
  */
 export function beginTransaction (connection: mysql.PoolConnection): Promise<mysql.PoolConnection> {
     return new Promise<mysql.PoolConnection>((resolve, reject) =>
@@ -102,6 +99,12 @@ export function beginTransaction (connection: mysql.PoolConnection): Promise<mys
     );
 }
 
+/**
+ * @description Commits transaction
+ *
+ * @param {import("mysql").PoolConnection} connection - database connection.
+ * @returns {void}
+ */
 export function commitTransaction (connection: mysql.PoolConnection): Promise<void> {
     return new Promise((resolve, reject) =>
         connection.commit((err: mysql.MysqlError) => {

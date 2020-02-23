@@ -6,8 +6,8 @@ const path = require('path');
 require('dotenv-expand')(
     require('dotenv').config({ path: path.join(__dirname, "../.env") }));
 
-const privateKey = fs.readFileSync(path.join(__dirname, "../private.key"), "utf8");
-const publicKEY = fs.readFileSync(path.join(__dirname, "../public.key"), "utf8");
+const privateKey = "Obvi_this_is_not_the_real_key"// fs.readFileSync(path.join(__dirname, "../private.key"), "utf8");
+const publicKEY = "Obvi_this_is_not_the_real_key"// fs.readFileSync(path.join(__dirname, "../public.key"), "utf8");
 
 
 const appDirectory = fs.realpathSync(process.cwd());
