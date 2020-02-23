@@ -108,7 +108,6 @@ export function beginTransaction (connection: mysql.PoolConnection): Promise<mys
 export function commitTransaction (connection: mysql.PoolConnection): Promise<void> {
     return new Promise((resolve, reject) =>
         connection.commit((err: mysql.MysqlError) => {
-            connection.release();
             if (err) {
                 logger.error("ERROR commiting transaction");
                 logger.error(`CODDE: ${err.code}`);

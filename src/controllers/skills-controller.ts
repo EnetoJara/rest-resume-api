@@ -25,8 +25,9 @@ export class SkillsController extends BaseController {
 
             return apiResponse(res, userSkills, OK);
         } catch (error) {
-            this.releaseConnection(connection);
             return res.status(GONE).send({ success: true, message: getStatusText(GONE) });
+        } finally {
+            this.releaseConnection(connection);
         }
     }
 }

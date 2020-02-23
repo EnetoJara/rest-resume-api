@@ -1,3 +1,4 @@
+import { ExecException } from 'child_process';
 import * as winston from "winston";
 
 const { colorize, combine, timestamp, label, printf, json } = winston.format;
@@ -43,6 +44,6 @@ export const logger = winston.createLogger({
     ]
 });
 
-export function displayError (error: Error): void {
+export function displayError (error: ExecException): void {
     Object.keys(error).forEach((key) => logger.debug(`${error[key]}`));
 }
