@@ -43,7 +43,6 @@ export const logger = winston.createLogger({
     ]
 });
 
-
 export function displayError (error: Error): void {
-    Object.keys(error).forEach(key=>logger.debug(`${error[key]}`))
+    Object.keys(error).forEach((key) => logger.debug(`${error[key]}`));
 }

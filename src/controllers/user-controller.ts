@@ -65,7 +65,7 @@ export class UserController extends BaseController {
         logger.debug("-------------------------------------");
         logger.debug("login user");
         let connection!: PoolConnection;
-        console.log('req: ', req);
+        console.log("req: ", req);
         try {
             connection = await this.getDBConnection();
 
@@ -80,7 +80,7 @@ export class UserController extends BaseController {
 
             const validPassword = await isEqualsPassword(user.password, credentials.password);
 
-            logger.debug(`is valid Password: ${validPassword}`)
+            logger.debug(`is valid Password: ${validPassword}`);
             if (!validPassword) {
                 return res
                     .status(NOT_FOUND)
@@ -99,8 +99,8 @@ export class UserController extends BaseController {
             logger.debug("creating token");
             const token = createToken(toSend);
 
-            logger.debug(`TOKEN: ${token}`)
-            return apiResponse(res, {...toSend, token: `Bearer ${token}`}, OK)
+            logger.debug(`TOKEN: ${token}`);
+            return apiResponse(res, { ...toSend, token: `Bearer ${token}` }, OK);
         } catch (error) {
             displayError(error);
             return res.status(GONE).send({ success: true, message: getStatusText(GONE) });
@@ -149,7 +149,7 @@ export class UserController extends BaseController {
                 user.idRole
             ]);
 
-            logger.debug("new id"+id);
+            logger.debug("new id" + id);
 
             this.finishTransaction(connection);
 
